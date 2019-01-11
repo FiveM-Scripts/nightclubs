@@ -87,11 +87,11 @@ Citizen.CreateThread(function()
                         local gox, goy, goz = table.unpack(v["garage_out"])
                         local ox, oy, oz = table.unpack(v["markout"])
 
-                        if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 50.5999 then -- Outside Marker
+                        if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 50.5999 then
                               DrawMarker(1, gix, giy, giz-1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 238, 227, 79, 200, 0, 0, 2, 0, 0, 0, 0)
                         end
 
-                        if GetDistanceBetweenCoords(coords, gox, goy, goz, true) < 2.0 then --Leave the garage
+                        if GetDistanceBetweenCoords(coords, gox, goy, goz, true) < 2.0 then
                               if not IsScreenFadedOut() then
                                     DoScreenFadeOut(200)
                                     Wait(250)
@@ -110,7 +110,7 @@ Citizen.CreateThread(function()
                         end
 
 
-                        if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 2.0 then -- Get inside the garage
+                        if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 2.0 then
                               local _, vector = GetNthClosestVehicleNode(coords.x, coords.y, coords.z, math.random(20, 180), 0, 0, 0)
                               success, vec3 = GetSafeCoordForPed(coords.x, coords.y, coords.z, false, 28)                              
                               
@@ -121,16 +121,16 @@ Citizen.CreateThread(function()
                               end
                         end                        
                   
-                        if GetDistanceBetweenCoords(coords, ix, iy, iz, true) < 50.5999 then -- Outside Marker
+                        if GetDistanceBetweenCoords(coords, ix, iy, iz, true) < 50.5999 then
                               DrawMarker(1, ix,iy,iz-1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 238, 227, 79, 200, 0, 0, 2, 0, 0, 0, 0)
                         end
 
-                        if GetDistanceBetweenCoords(coords, ox, oy, oz, true) < 10.0 then -- Inside Marker
+                        if GetDistanceBetweenCoords(coords, ox, oy, oz, true) < 10.0 then
                               DrawMarker(1, ox, oy, oz-1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 238, 227, 79, 200, 0, 0, 2, 0, 0, 0, 0)
                         end                        
 
 
-                        if GetDistanceBetweenCoords(coords, ox, oy, oz, true) < 2.0 then -- Inside Marker
+                        if GetDistanceBetweenCoords(coords, ox, oy, oz, true) < 2.0 then
                               if not IsScreenFadedOut() then
                                     DoScreenFadeOut(200)
                                     Wait(250)
