@@ -1,5 +1,5 @@
--- Choose between solomon or dixon
-current_dj = "solomon"
+-- Choose between solomun or dixon
+current_dj = "solomun"
 
 -- Configure the coordinates for each nightclub
 locations = {

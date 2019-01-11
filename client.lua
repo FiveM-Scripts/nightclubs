@@ -1,7 +1,7 @@
 IsPlayerNearClub = false
 
 function CreateDj(dj) 
-      if dj == "solomon" then
+      if dj == "solomun" then
             model = "csb_sol"
       elseif dj == "dixon" then
             model = "csb_dix"
@@ -67,7 +67,7 @@ end
 
 Citizen.CreateThread(function()
       DoScreenFadeIn(100)
-
+      RequestIpl("ba_case7_dixon")
       for k,v in pairs(locations) do
             local ix,iy,iz = table.unpack(v["markin"])
             local blip = AddBlipForCoord(ix,iy,iz)
