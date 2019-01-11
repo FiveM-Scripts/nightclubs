@@ -38,7 +38,7 @@ function PrepareClubInterior(interiorID)
       for k,v in pairs(interiorsProps) do
             if not IsInteriorPropEnabled(interiorID, v) then
                   EnableInteriorProp(interiorID, v)
-                  Wait(20)
+                  Wait(30)
             end
       end
 
@@ -53,26 +53,50 @@ function PrepareClubInterior(interiorID)
 end
 
 function TaskEnterNightClubGarage()
-      if not IsPedInAnyVehicle(playerPed, false) then
-            SetEntityCoords(playerPed, -1628.12, -2995.87, -78.1438-1.0)
-      else
-            SetPedCoordsKeepVehicle(playerPed, -1628.12, -2995.87, -78.1438-1.0)
-      end
+      Wait(100)
+      interiorID = GetInteriorAtCoordsWithType(-1604.664, -3012.583, -79.9999, "ba_dlc_int_01_ba")
+      if IsValidInterior(interiorID) then
+            LoadInterior(interiorID)
+            if IsInteriorReady(interiorID) then
+                  PrepareClubInterior(interiorID)
+                  if not DoesEntityExist(dj) then
+                        dj = CreateDj(current_dj)
+                  end
 
-      if IsScreenFadedOut() then
-            DoScreenFadeIn(200)
-            Wait(250)
+                  if not IsPedInAnyVehicle(playerPed, false) then
+                        SetEntityCoords(playerPed, -1627.85, -3006.42, -78.7933-1.0)
+                  else
+                        SetPedCoordsKeepVehicle(playerPed, -1627.85, -3006.42, -78.7933-1.0)
+                  end
+
+                  DisplayRadar(false)
+                  SetGameplayCamRelativeHeading(12.1322)
+                  SetGameplayCamRelativePitch(-3.2652, 1065353216)
+                 
+                  StartAudioScene("DLC_Ba_NightClub_Scene")
+                  PlaySoundFrontend(-1, "club_crowd_transition", "dlc_btl_club_open_transition_crowd_sounds", true)
+            end
       end
+      DoScreenFadeIn(200)
 end
 
 Citizen.CreateThread(function()
       DoScreenFadeIn(100)
-      RequestIpl("ba_case7_dixon")
+
       for k,v in pairs(locations) do
             local ix,iy,iz = table.unpack(v["markin"])
             local blip = AddBlipForCoord(ix,iy,iz)
+
             SetBlipSprite(blip, 614)
             SetBlipNameFromTextFile(blip, "CLUB_QUICK_GPS")
+            
+            if not IsIplActive(v["banner"]) then
+                  RequestIpl(v["banner"])
+            end
+
+            if not IsIplActive(v["barrier"]) then
+                  RequestIpl(v["barrier"])
+            end
       end
       
       while true do
@@ -85,41 +109,40 @@ Citizen.CreateThread(function()
                         local ix,iy,iz = table.unpack(v["markin"])
                         local gix, giy, giz = table.unpack(v["garage_in"])
                         local gox, goy, goz = table.unpack(v["garage_out"])
-                        local ox, oy, oz = table.unpack(v["markout"])
+                        local ox, oy, oz = table.unpack(v["markout"])                        
 
                         if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 50.5999 then
                               DrawMarker(1, gix, giy, giz-1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 238, 227, 79, 200, 0, 0, 2, 0, 0, 0, 0)
                         end
 
-                        if GetDistanceBetweenCoords(coords, gox, goy, goz, true) < 2.0 then
+                        if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 2.0 then                             
+                              if not IsScreenFadingOut() then
+                                    DoScreenFadeOut(200)
+                              end
+                              TaskEnterNightClubGarage()
+                        end                        
+
+                        if GetDistanceBetweenCoords(coords, gox, goy, goz, true) < 3.0 then
                               if not IsScreenFadedOut() then
                                     DoScreenFadeOut(200)
                                     Wait(250)
+                                    CleanUpInterior(interiorID)
 
-                                    if success then
+                                    if k == k then
+                                          local fex, fey, fez = table.unpack(v["garage_exit"])
                                           if not IsPedInAnyVehicle(playerPed, false) then
-                                                SetEntityCoords(playerPed, vec3.x, vec3.y, vec3.z-1.0)
+                                                SetEntityCoords(playerPed, fex, fey, fez-1.0)
                                           else
-                                                SetPedCoordsKeepVehicle(playerPed, vec3.x, vec3.y, vec3.z-1.0)
+                                                SetPedCoordsKeepVehicle(playerPed, fex, fey, fez-1.0)
                                           end
 
-                                          Wait(250)
-                                          DoScreenFadeIn(300)
+                                          DisplayRadar(true)
                                     end
+
+                                    Wait(250)
+                                    DoScreenFadeIn(300)
                               end
                         end
-
-
-                        if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 2.0 then
-                              local _, vector = GetNthClosestVehicleNode(coords.x, coords.y, coords.z, math.random(20, 180), 0, 0, 0)
-                              success, vec3 = GetSafeCoordForPed(coords.x, coords.y, coords.z, false, 28)                              
-                              
-                              if not IsScreenFadedOut() then
-                                    DoScreenFadeOut(200)
-                                    Wait(300)
-                                    TaskEnterNightClubGarage()
-                              end
-                        end                        
                   
                         if GetDistanceBetweenCoords(coords, ix, iy, iz, true) < 50.5999 then
                               DrawMarker(1, ix,iy,iz-1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 238, 227, 79, 200, 0, 0, 2, 0, 0, 0, 0)
@@ -134,24 +157,19 @@ Citizen.CreateThread(function()
                               if not IsScreenFadedOut() then
                                     DoScreenFadeOut(200)
                                     Wait(250)
-                                    CleanUpInterior()
-                                    if success then
-                                          SetEntityCoords(playerPed, vec3.x, vec3.y, vec3.z-1.0)
+                                    CleanUpInterior(interiorID)
+                                    Wait(10)
+
+                                    if k == k then
+                                          local fex, fey, fez = table.unpack(v["exit"])
+                                          SetEntityCoords(playerPed, fex, fey, fez-1.0)
                                           Wait(250)
                                           DoScreenFadeIn(300)
-                                    end   
+                                    end 
                               end
                         end
 
                         if GetDistanceBetweenCoords(coords, ix, iy, iz, true) < 1.0 then
-                              if not IsScreenFadedOut() then
-                                    local _, vector = GetNthClosestVehicleNode(coords.x, coords.y, coords.z, math.random(20, 180), 0, 0, 0)
-                                    success, vec3 = GetSafeCoordForPed(coords.x, coords.y, coords.z, false, 28)
-                                    
-                                    DoScreenFadeOut(300)
-                                    Wait(350)
-                              end
-
                               interiorID = GetInteriorAtCoordsWithType(-1604.664, -3012.583, -79.9999, "ba_dlc_int_01_ba")
                               if IsValidInterior(interiorID) then
                                     LoadInterior(interiorID)
@@ -162,7 +180,7 @@ Citizen.CreateThread(function()
                                                 dj = CreateDj(current_dj)
                                           end
 
-                                          SetEntityCoords(playerPed,-1591.4850, -3013.6070, -80.0060, 1, false, 0, 1)     
+                                          SetEntityCoords(playerPed,-1591.4850, -3013.6070, -80.0060, 1, false, 0, 1)
                                           SetEntityHeading(playerPed, 74.0804)
 
                                           SetGameplayCamRelativeHeading(12.1322)

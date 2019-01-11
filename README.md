@@ -6,8 +6,8 @@ We are planning to add more features soon.
 
 ## Installation
 1. Download and extract the resource.
-2. Copy the files to `resources/nightclubs`
-3. Add `start nightclubs` to your server configuration file (**server.cfg**)
+2. Copy the files to `resources/nightclubs`.
+3. Add `start nightclubs` to your server configuration file (**server.cfg**).
 4. start your server.
 
 ## Screenshot
