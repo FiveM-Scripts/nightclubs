@@ -27,7 +27,8 @@ function CleanUpInterior(interiorID)
                   Wait(10)
             end
       end
-
+      
+      StopAudioScenes()
       ReleaseScriptAudioBank()
       Wait(200)
       RefreshInterior(interiorID)
