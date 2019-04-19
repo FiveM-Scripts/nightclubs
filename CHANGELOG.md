@@ -1,5 +1,6 @@
 ## 1.0-alpha3
-* Fixed an issue that caused gun shots to stop being heard when the player left the nightclub.
+* Added working tv screens.
+* Fixed spawn point.
 
 ## 1.0-alpha2
 * Added banner outside the nightclub.
