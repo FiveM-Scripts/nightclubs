@@ -1,5 +1,3 @@
-IsPlayerNearClub = false
-
 function CreateDj(dj) 
       if dj == "solomun" then
             model = "csb_sol"
@@ -17,7 +15,7 @@ function CreateDj(dj)
       SetBlockingOfNonTemporaryEvents(ped, true)
       SetModelAsNoLongerNeeded(model) 
 
-      return ped     
+      return ped
 end
 
 function CleanUpInterior(interiorID)
@@ -51,6 +49,8 @@ function PrepareClubInterior(interiorID)
       SetAmbientZoneState("IZ_ba_dlc_int_01_ba_Int_01_main_area", 0, 0)
       Wait(100)
       RefreshInterior(interiorID)
+
+      IsPedInNightClub = true
 end
 
 function TaskEnterNightClubGarage()
@@ -78,8 +78,30 @@ function TaskEnterNightClubGarage()
                   PlaySoundFrontend(-1, "club_crowd_transition", "dlc_btl_club_open_transition_crowd_sounds", true)
             end
       end
+      IsPedInNightClub = true
       DoScreenFadeIn(200)
 end
+
+function RenderScreenModel(name, model)
+      local handle = 0
+
+      if not IsNamedRendertargetRegistered(name) then
+            RegisterNamedRendertarget(name, 0)
+      end
+      
+      if not IsNamedRendertargetLinked(model) then
+            LinkNamedRendertarget(model)
+      end
+
+      if IsNamedRendertargetRegistered(name) then
+            handle = GetNamedRendertargetRenderId(name)
+      end
+
+      return handle
+end
+
+IsPlayerNearClub = false
+IsPedInNightClub = false
 
 Citizen.CreateThread(function()
       DoScreenFadeIn(100)
@@ -88,7 +110,9 @@ Citizen.CreateThread(function()
             local ix,iy,iz = table.unpack(v["markin"])
             local blip = AddBlipForCoord(ix,iy,iz)
 
+            SetBlipAsShortRange(blip, true)
             SetBlipSprite(blip, 614)
+            SetBlipScale(blip, 0.7)
             SetBlipNameFromTextFile(blip, "CLUB_QUICK_GPS")
             
             if not IsIplActive(v["banner"]) then
@@ -110,18 +134,18 @@ Citizen.CreateThread(function()
                         local ix,iy,iz = table.unpack(v["markin"])
                         local gix, giy, giz = table.unpack(v["garage_in"])
                         local gox, goy, goz = table.unpack(v["garage_out"])
-                        local ox, oy, oz = table.unpack(v["markout"])                        
+                        local ox, oy, oz = table.unpack(v["markout"])
 
                         if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 50.5999 then
                               DrawMarker(1, gix, giy, giz-1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 238, 227, 79, 200, 0, 0, 2, 0, 0, 0, 0)
                         end
 
-                        if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 2.0 then                             
+                        if GetDistanceBetweenCoords(coords, gix, giy, giz, true) < 2.0 then
                               if not IsScreenFadingOut() then
                                     DoScreenFadeOut(200)
                               end
                               TaskEnterNightClubGarage()
-                        end                        
+                        end
 
                         if GetDistanceBetweenCoords(coords, gox, goy, goz, true) < 3.0 then
                               if not IsScreenFadedOut() then
@@ -142,6 +166,7 @@ Citizen.CreateThread(function()
 
                                     Wait(250)
                                     DoScreenFadeIn(300)
+                                    IsPedInNightClub = false
                               end
                         end
                   
@@ -151,7 +176,7 @@ Citizen.CreateThread(function()
 
                         if GetDistanceBetweenCoords(coords, ox, oy, oz, true) < 10.0 then
                               DrawMarker(1, ox, oy, oz-1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 238, 227, 79, 200, 0, 0, 2, 0, 0, 0, 0)
-                        end                        
+                        end
 
 
                         if GetDistanceBetweenCoords(coords, ox, oy, oz, true) < 2.0 then
@@ -166,6 +191,7 @@ Citizen.CreateThread(function()
                                           SetEntityCoords(playerPed, fex, fey, fez-1.0)
                                           Wait(250)
                                           DoScreenFadeIn(300)
+                                          IsPedInNightClub = false
                                     end 
                               end
                         end
@@ -181,8 +207,8 @@ Citizen.CreateThread(function()
                                                 dj = CreateDj(current_dj)
                                           end
 
-                                          SetEntityCoords(playerPed,-1591.4850, -3013.6070, -80.0060, 1, false, 0, 1)
-                                          SetEntityHeading(playerPed, 74.0804)
+                                          SetEntityCoords(playerPed, -1569.5865, -3014.5998, -74.4061, 1, false, 0, 1)
+                                          SetEntityHeading(playerPed, 15.0804)
 
                                           SetGameplayCamRelativeHeading(12.1322)
                                           SetGameplayCamRelativePitch(-3.2652, 1065353216)
@@ -195,6 +221,33 @@ Citizen.CreateThread(function()
                               end
                         end
                   end
+            end
+      end
+end)
+
+Citizen.CreateThread(function ()
+      local model = GetHashKey("ba_prop_club_screens_01");
+      sHandle = RenderScreenModel("club_projector", model)
+      Wait(500)
+
+      RegisterScriptWithAudio(0)
+      if current_dj == "solomun" then
+            Citizen.InvokeNative(0x9DD5A62390C3B735, 2, "PL_SOL_RIB_PALACE", 0)
+      else
+            Citizen.InvokeNative(0x9DD5A62390C3B735, 2, "PL_DIX_RIB_PALACE", 0)
+      end
+      SetTvChannel(2)
+      SetTvAudioFrontend(0)
+
+      while true do
+            Wait(1)
+            if IsPedInNightClub then
+                  SetTextRenderId(sHandle)
+                  SetScriptGfxDrawOrder(4)
+                  SetScriptGfxDrawBehindPausemenu(1)
+
+                  DrawTvChannel(0.5, 0.5, 1.0, 1.0, 0.0, 255, 255, 255, 255)
+                  SetTextRenderId(GetDefaultScriptRendertargetRenderId())
             end
       end
 end)
