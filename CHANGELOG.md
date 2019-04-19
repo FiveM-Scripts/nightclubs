@@ -1,6 +1,9 @@
-## 1.0-alpha3
+## 1.0-alpha4
 * Added working tv screens.
 * Fixed spawn point.
+
+## 1.0-alpha3
+* Fixed a issue where all sound would drop when a player leaves the nightclub.
 
 ## 1.0-alpha2
 * Added banner outside the nightclub.
